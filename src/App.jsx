@@ -23,6 +23,7 @@ import movieImg from "./assets/MovieHub.png";
 import patoImg from "./assets/pato-place-project.png";
 import suitesImg from "./assets/Suites.png";
 import ymchImg from "./assets/YMCH.png";
+import FurEver from "./assets/Furever_Care.png";
 
 /* -------------------- Helper Components -------------------- */
 const Container = ({ children, className = "" }) => (
@@ -105,7 +106,7 @@ const PROJECTS = [
   {
     title: "GameHub ",
     description:
-      "Flashcards, audio, quizzes and stories for Yoruba, Igbo, and Hausa. Offline-first with local caching.",
+      "An interactive gaming site built with React & Vite, featuring sleek design, engaging user experience, and fast loading times",
     tech: ["React", "Tailwind CSS", "Framer Motion"],
     image: gameImg,
     url: "https://game-web-khaki.vercel.app/",
@@ -116,7 +117,7 @@ const PROJECTS = [
   {
     title: "MovieHub",
     description:
-      "Buy & sell farm products with escrow and delivery tracking. Admin analytics dashboard included.",
+      "“MovieHub – Discover and track films easily with intuitive search, personalized watchlists, and up-to-date ratings.",
     tech: ["React", "Tailwind CSS", "Framer Motion"],
     image: movieImg,
     url: "https://movie-hub-nu-lilac.vercel.app/",
@@ -127,7 +128,7 @@ const PROJECTS = [
   {
     title: "Pato Place",
     description:
-      "Beautiful directory of beaches with filters, maps and favorites. Accessible and super fast.",
+      "“Pato Place is an authentic Italian restaurant offering wood-fired pizzas, fresh pasta, and fine wines in a romantic setting. Cozy ambiance, delicious flavors, and warm hospitality—perfect for special occasions or relaxed evenings.",
     tech: ["HTML", "CSS", "JavaScript"],
     image: patoImg,
     url: "https://pato-place-seven.vercel.app/",
@@ -138,7 +139,7 @@ const PROJECTS = [
   {
     title: "Suites",
     description:
-      "Beautiful directory of beaches with filters, maps and favorites. Accessible and super fast.",
+      "A modern hotel website with elegant design, seamless booking navigation, and rich visuals to showcase luxury suites.",
     tech: ["React", "Tailwind CSS", "Framer Motion"],
     image: suitesImg,
     url: "https://suites-hotel.vercel.app/",
@@ -149,11 +150,22 @@ const PROJECTS = [
   {
     title: "Young Mothers & Child Haven Foundation",
     description:
-      "Beautiful directory of beaches with filters, maps and favorites. Accessible and super fast.",
+      "“A nonprofit organization dedicated to [cause/mission — e.g. youth mentorship, community health, etc.], providing impactful resources, support, and stories, with clear ways to get involved and donate.",
     tech: ["React", "Tailwind CSS", "Framer Motion"],
     image: ymchImg,
     url: "https://www.ymchfoundation.org/",
     repo: "https://github.com/Ibthecoder/ChildFoundation",
+    highlight: "95+ Lighthouse score across the board",
+    category: "web",
+  },
+  {
+    title: "FurEver Care",
+    description:
+      "“A sleek portfolio showcasing projects, skills, and contact information with a modern design",
+    tech: ["React", "Tailwind CSS", "Framer Motion"],
+    image: FurEver,
+    url: "https://furever-care-two.vercel.app/",
+    repo: "https://github.com/AY-CODED/Furever_Care",
     highlight: "95+ Lighthouse score across the board",
     category: "web",
   },
