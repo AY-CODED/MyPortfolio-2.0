@@ -23,7 +23,7 @@ import movieImg from "./assets/MovieHub.png";
 import patoImg from "./assets/pato-place-project.png";
 import suitesImg from "./assets/Suites.png";
 import ymchImg from "./assets/YMCH.png";
-import FurEver from "./assets/Furever_Care.png";
+import FurEver from "./assets/FurEver_Care.png";
 
 /* -------------------- Helper Components -------------------- */
 const Container = ({ children, className = "" }) => (
