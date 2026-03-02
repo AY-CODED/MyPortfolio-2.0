@@ -12,8 +12,10 @@ import {
   MeshDistortMaterial,
   Stars,
   Sparkles,
-  PerspectiveCamera
+  PerspectiveCamera,
+  useProgress
 } from "@react-three/drei";
+import { motion, AnimatePresence } from "framer-motion";
 import * as THREE from "three";
 import {
   Github,
@@ -33,7 +35,7 @@ import ymchImg from "./assets/YMCH.png";
 /* -------------------- Data -------------------- */
 const PROFILE = {
   name: "Ayomipo Soyinka",
-  role: "Full-Stack Developer & Graphic Designer",
+  role: "Digital Architect & Full-Stack Developer",
   blurb: "I bridge the gap between high-end design and robust engineering. Specialized in building immersive, performant web experiences with a focus on clean architecture and sophisticated UI.",
   location: "Lagos, Nigeria",
   photo: myPic,
@@ -84,48 +86,57 @@ function MacBook({ url, ...props }) {
   const [hovered, setHovered] = useState(false);
   const scroll = useScroll();
   const group = useRef();
+  const { viewport } = useThree();
+
+  // Responsive scale based on viewport width
+  const responsiveScale = Math.min(viewport.width / 10, 1);
 
   useFrame((state) => {
     const s = scroll.offset;
     // Fade out and tilt as we scroll away
-    group.current.position.z = -s * 15;
-    group.current.rotation.x = -s * Math.PI / 4;
-    group.current.scale.setScalar(1 - s * 0.6);
+    group.current.position.z = -s * 25;
+    group.current.rotation.x = -s * Math.PI / 3;
+    group.current.position.y = props.position[1] - s * 5;
+    group.current.scale.setScalar(responsiveScale * (1 - s * 0.8));
   });
 
   return (
     <group ref={group} {...props} onPointerOver={() => setHovered(true)} onPointerOut={() => setHovered(false)}>
-      <Float rotationIntensity={0.2} floatIntensity={0.5} speed={2}>
+      <Float rotationIntensity={0.1} floatIntensity={0.2} speed={1.5}>
         {/* MacBook Body */}
         <mesh position={[0, -0.05, 0]} castShadow>
           <boxGeometry args={[4, 0.1, 2.8]} />
-          <meshStandardMaterial color="#222" metalness={0.9} roughness={0.1} />
+          <meshStandardMaterial color="#1a1a1a" metalness={1} roughness={0.2} />
         </mesh>
 
         {/* Screen */}
-        <group position={[0, 0, -1.4]} rotation={[-Math.PI / 12, 0, 0]}>
+        <group position={[0, 0, -1.4]} rotation={[-Math.PI / 15, 0, 0]}>
           <mesh position={[0, 1.4, 0]} castShadow>
-            <boxGeometry args={[4, 2.8, 0.05]} />
-            <meshStandardMaterial color="#111" metalness={1} roughness={0} />
+            <boxGeometry args={[4.05, 2.85, 0.05]} />
+            <meshStandardMaterial color="#050505" metalness={1} roughness={0.1} />
           </mesh>
 
           <Html
             transform
             distanceFactor={1.5}
-            position={[0, 1.4, 0.03]}
-            occlude
+            position={[0, 1.4, 0.035]}
+            portal={{ current: document.body }}
           >
-            <div className={`transition-all duration-700 w-[1024px] h-[716px] bg-black overflow-hidden rounded-md border-[6px] border-[#111] ${hovered ? 'scale-100' : 'scale-[0.98]'}`}>
+            <div
+              className={`transition-all duration-1000 w-[1024px] h-[716px] bg-black overflow-hidden rounded-sm border-[4px] border-[#080808] shadow-2xl pointer-events-auto ${hovered ? 'scale-100 opacity-100' : 'scale-[0.99] opacity-90'}`}
+              onPointerOver={() => setHovered(true)}
+            >
                <iframe
                 src={url}
                 className="w-full h-full border-none"
                 title="Estate Hub"
+                loading="lazy"
                />
-               {!hovered && <div className="absolute inset-0 bg-cyan-500/5 pointer-events-none" />}
+               {!hovered && <div className="absolute inset-0 bg-white/[0.02] pointer-events-none" />}
             </div>
           </Html>
         </group>
-        <ContactShadows position={[0, -1.5, 0]} opacity={0.6} scale={15} blur={1.5} far={4.5} />
+        <ContactShadows position={[0, -1.5, 0]} opacity={0.4} scale={15} blur={2.5} far={4.5} />
       </Float>
     </group>
   );
@@ -135,6 +146,9 @@ function ProjectCard({ project, index, ...props }) {
   const [hovered, setHovered] = useState(false);
   const scroll = useScroll();
   const mesh = useRef();
+  const { viewport } = useThree();
+
+  const responsiveScale = Math.min(viewport.width / 10, 1);
 
   useFrame((state) => {
     const s = scroll.offset;
@@ -146,7 +160,7 @@ function ProjectCard({ project, index, ...props }) {
 
     // Smoothly scale and pop out when centered
     const focus = Math.max(0, 1 - dist * 4);
-    mesh.current.scale.lerp(new THREE.Vector3().setScalar(0.7 + focus * 0.5), 0.1);
+    mesh.current.scale.lerp(new THREE.Vector3().setScalar(responsiveScale * (0.7 + focus * 0.5)), 0.1);
     mesh.current.position.z = focus * 2.5;
     mesh.current.rotation.y = (index % 2 === 0 ? -0.25 : 0.25) * (1 - focus);
   });
@@ -158,33 +172,49 @@ function ProjectCard({ project, index, ...props }) {
       onPointerOut={() => setHovered(false)}
       onClick={() => window.open(project.url, "_blank")}
     >
-      <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.2}>
+      <Float speed={1.2} rotationIntensity={0.1} floatIntensity={0.1}>
         <mesh ref={mesh} castShadow>
-          <boxGeometry args={[3.8, 2.6, 0.05]} />
-          <meshStandardMaterial color="#080808" metalness={0.8} roughness={0.1} />
+          <boxGeometry args={[4, 2.8, 0.05]} />
+          <meshStandardMaterial color="#0a0a0a" metalness={0.9} roughness={0.1} />
+
+          <mesh position={[0, 0, 0.03]}>
+             <boxGeometry args={[4.1, 2.9, 0.01]} />
+             <meshStandardMaterial color="white" transparent opacity={0.05} metalness={1} roughness={0} />
+          </mesh>
+
           <Html
             transform
-            distanceFactor={2.6}
-            position={[0, 0, 0.04]}
+            distanceFactor={2.8}
+            position={[0, 0, 0.06]}
             className="pointer-events-none select-none"
           >
-            <div className={`transition-all duration-500 w-[440px] h-[300px] p-10 flex flex-col justify-between bg-zinc-950/70 text-white rounded-3xl border border-white/5 backdrop-blur-2xl ${hovered ? 'border-cyan-500/50 scale-[1.02]' : ''}`}>
-              <div className="space-y-4">
-                <div className="flex justify-between items-start">
-                  <h3 className="text-3xl font-black tracking-tighter text-white/95">{project.title}</h3>
-                  <div className={`p-2.5 rounded-2xl bg-white/5 border border-white/10 transition-colors ${hovered ? 'bg-cyan-500/20' : ''}`}>
-                    <ExternalLink size={16} className="text-cyan-400" />
-                  </div>
+            <div className={`relative overflow-hidden transition-all duration-700 w-[500px] h-[350px] flex flex-col justify-between bg-zinc-950/40 text-white rounded-[2.5rem] border border-white/10 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] ${hovered ? 'border-white/20 translate-y-[-10px]' : ''}`}>
+
+              {project.image && (
+                <div className="absolute inset-0 z-0 opacity-30 overflow-hidden">
+                   <img src={project.image} alt="" className="w-full h-full object-cover grayscale" />
                 </div>
-                <p className="text-sm text-zinc-400 leading-relaxed font-medium line-clamp-3">{project.description}</p>
-                {project.slogan && <p className="text-[10px] font-bold italic text-cyan-400/80 uppercase tracking-[0.2em]">{project.slogan}</p>}
-              </div>
-              <div className="flex flex-wrap gap-2.5">
-                {project.tech.map(t => (
-                  <span key={t} className="px-3 py-1 bg-white/5 border border-white/5 rounded-full text-[9px] font-black uppercase tracking-[0.1em] text-zinc-500">
-                    {t}
-                  </span>
-                ))}
+              )}
+
+              <div className="relative z-10 p-12 space-y-6 h-full flex flex-col justify-between">
+                <div>
+                  <div className="flex justify-between items-start">
+                    <h3 className="text-4xl font-serif italic tracking-tight text-[#f8f8f8]">{project.title}</h3>
+                    <div className={`p-3 rounded-full bg-white/5 border border-white/10 transition-all duration-500 ${hovered ? 'bg-white/10 scale-110' : ''}`}>
+                      <ExternalLink size={18} className="text-white/70" />
+                    </div>
+                  </div>
+                  <p className="mt-4 text-[13px] font-sans text-zinc-300 leading-[1.8] font-light tracking-wide line-clamp-3">{project.description}</p>
+                  {project.slogan && <p className="mt-2 text-[10px] font-sans font-medium italic text-zinc-500 uppercase tracking-[0.3em]">{project.slogan}</p>}
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {project.tech.map(t => (
+                    <span key={t} className="px-4 py-1.5 bg-white/5 border border-white/5 rounded-full text-[9px] font-sans font-semibold uppercase tracking-[0.15em] text-zinc-400">
+                      {t}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </Html>
@@ -234,13 +264,20 @@ function Background() {
 }
 
 function Scene() {
+  const [hovered, setHovered] = useState(false);
   const scroll = useScroll();
   const projectsGroup = useRef();
+  const { viewport } = useThree();
+  const isMobile = viewport.width < 6;
 
   useFrame((state) => {
     const offset = scroll.offset;
-    // Move whole group up as we scroll
-    projectsGroup.current.position.y = offset * (PROJECTS.length * 12);
+    // Smoother interpolation for section transitions
+    projectsGroup.current.position.y = THREE.MathUtils.lerp(
+      projectsGroup.current.position.y,
+      offset * (PROJECTS.length * 12),
+      0.1
+    );
   });
 
   return (
@@ -248,23 +285,26 @@ function Scene() {
       <Background />
 
       <group ref={projectsGroup}>
-        {/* Centerpiece Section */}
+        {/* Hero Section */}
         <group position={[0, 0, 0]}>
-          <MacBook url={PROJECTS[0].url} position={[0, -0.8, 0]} />
+          <MacBook url={PROJECTS[0].url} position={[0, -1, 0]} />
           <Text
-            position={[0, 4.2, -5]}
-            fontSize={1}
-            color="white"
+            position={[0, isMobile ? 3.5 : 4.5, -5]}
+            fontSize={isMobile ? 0.7 : 1.4}
+            color="#f8f8f8"
+            font="https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD-vYSZtu_9z92UM01_YfS_Y9p_E71N0mNlX7S5yS4A.woff"
             fontWeight="900"
-            letterSpacing={-0.1}
+            letterSpacing={-0.02}
+            maxWidth={viewport.width * 0.8}
+            textAlign="center"
           >
             {PROFILE.name.toUpperCase()}
           </Text>
           <Text
-            position={[0, 3.2, -5]}
-            fontSize={0.15}
-            color="#555"
-            letterSpacing={0.5}
+            position={[0, isMobile ? 2.8 : 3.5, -5]}
+            fontSize={isMobile ? 0.12 : 0.18}
+            color="#666"
+            letterSpacing={0.4}
             fontWeight="bold"
           >
             {PROFILE.role.toUpperCase()}
@@ -277,38 +317,61 @@ function Scene() {
             key={project.title}
             project={project}
             index={i}
-            position={[i % 2 === 0 ? 3.8 : -3.8, - (i + 1) * 12, -1]}
+            position={[
+              isMobile ? 0 : (i % 2 === 0 ? 4 : -4),
+              - (i + 1) * 12,
+              -1
+            ]}
           />
         ))}
 
-        {/* Final Contact Section */}
+        {/* Contact Section */}
         <group position={[0, - PROJECTS.length * 12, 0]}>
+           <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
              <Text
-              fontSize={1.4}
-              color="white"
+              fontSize={isMobile ? 0.8 : 1.5}
+              color="#f8f8f8"
+              font="https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD-vYSZtu_9z92UM01_YfS_Y9p_E71N0mNlX7S5yS4A.woff"
               fontWeight="900"
-              letterSpacing={-0.08}
+              letterSpacing={-0.02}
               position={[0, 2, 0]}
              >
-                LET'S CREATE.
+                Let's Converse.
              </Text>
-             <Text
-              fontSize={0.12}
-              color="#444"
-              position={[0, 0.5, 0]}
-              letterSpacing={0.6}
-              fontWeight="bold"
-             >
-                READY TO BRING YOUR VISION TO LIFE
-             </Text>
+           </Float>
 
-             {/* Glow core */}
-             <Float speed={4} rotationIntensity={2}>
-               <mesh position={[0, -2, -2]}>
-                 <sphereGeometry args={[0.4, 32, 32]} />
-                 <meshStandardMaterial color="#00ffff" emissive="#00ffff" emissiveIntensity={5} />
-               </mesh>
-             </Float>
+           <Text
+            fontSize={0.15}
+            color="#666"
+            position={[0, 0.5, 0]}
+            letterSpacing={0.5}
+            fontWeight="bold"
+           >
+              CRAFTING LUXURY DIGITAL EXPERIENCES
+           </Text>
+
+           <mesh
+            position={[0, -2, 0]}
+            onPointerOver={() => setHovered(true)}
+            onPointerOut={() => setHovered(false)}
+            onClick={() => window.location.href = PROFILE.socials.email}
+           >
+              <sphereGeometry args={[1.5, 64, 64]} />
+              <MeshDistortMaterial
+                color={hovered ? "#fff" : "#111"}
+                speed={2}
+                distort={0.4}
+                radius={1}
+                metalness={1}
+                roughness={0.1}
+              />
+              <Html center position={[0, 0, 0]}>
+                 <div className={`transition-opacity duration-500 flex flex-col items-center gap-4 pointer-events-none ${hovered ? 'opacity-100' : 'opacity-0'}`}>
+                    <Mail size={32} className="text-black" />
+                    <span className="text-black font-bold text-xs uppercase tracking-widest">Email Me</span>
+                 </div>
+              </Html>
+           </mesh>
         </group>
       </group>
 
@@ -323,57 +386,71 @@ function Overlay() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-10 flex flex-col justify-between p-12 sm:p-20 text-white overflow-hidden">
-      <header className="flex justify-between items-start pointer-events-auto">
-        <div className="flex flex-col group cursor-pointer" onClick={() => window.scrollTo(0,0)}>
-          <h1 className="text-3xl font-black tracking-tighter italic leading-none group-hover:text-cyan-400 transition-colors duration-500">AS.</h1>
-          <span className="text-[9px] uppercase tracking-[0.4em] font-black text-zinc-600 mt-2">Design & Code</span>
+    <div className="fixed inset-0 pointer-events-none z-10 flex flex-col justify-between p-10 sm:p-20 text-white overflow-y-auto sm:overflow-hidden">
+      <header className="flex justify-between items-start pointer-events-none mb-20 sm:mb-0">
+        <div className="flex flex-col group cursor-pointer pointer-events-auto" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <h1 className="text-3xl sm:text-4xl font-serif italic leading-none transition-all duration-700">AS.</h1>
+          <span className="text-[9px] uppercase tracking-[0.4em] font-medium text-zinc-500 mt-2">Digital Architect</span>
         </div>
-        <nav className="hidden lg:flex gap-20 text-[10px] uppercase tracking-[0.5em] font-black text-zinc-600">
-          <a href="#" className="hover:text-white transition-all duration-700 hover:tracking-[0.7em]">Works</a>
-          <a href="#" className="hover:text-white transition-all duration-700 hover:tracking-[0.7em]">About</a>
-          <a href={PROFILE.socials.email} className="hover:text-white transition-all duration-700 hover:tracking-[0.7em]">Contact</a>
-        </nav>
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-500 pointer-events-auto backdrop-blur-xl"
-        >
-           <Menu size={20} className={menuOpen ? 'text-cyan-400' : 'text-white'} />
-        </button>
+
+        <div className="flex items-center gap-12 sm:gap-20">
+          <nav className="hidden lg:flex gap-16 text-[10px] uppercase tracking-[0.4em] font-semibold text-zinc-500">
+            <button className="hover:text-white transition-all duration-500 pointer-events-auto uppercase">Curated Works</button>
+            <a href="#" className="hover:text-white transition-all duration-500 pointer-events-auto">Process</a>
+            <a href={PROFILE.socials.email} className="hover:text-white transition-all duration-500 pointer-events-auto">Inquire</a>
+          </nav>
+
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-500 pointer-events-auto backdrop-blur-3xl"
+          >
+             <Menu size={20} className="text-white/80" />
+          </button>
+        </div>
       </header>
 
-      <div className="flex flex-col items-start gap-10 max-w-lg pointer-events-auto">
-         <div className="space-y-4">
+      <div className="flex flex-col items-start gap-12 max-w-xl pointer-events-none mb-10 mt-[45vh] sm:mt-0">
+         <div className="space-y-6">
            <div className="flex items-center gap-4">
-             <div className="w-8 h-[1px] bg-cyan-500" />
-             <p className="text-[11px] uppercase tracking-[0.6em] font-black text-cyan-500 animate-pulse">Open for collaboration</p>
+             <div className="w-10 h-[1px] bg-zinc-700" />
+             <p className="text-[10px] uppercase tracking-[0.5em] font-bold text-zinc-400">Selected Works 2024—25</p>
            </div>
-           <h2 className="text-xl font-medium text-zinc-400 leading-snug tracking-tight">I design and develop immersive 3D digital experiences for modern brands.</h2>
+           <h2 className="text-3xl sm:text-4xl font-serif italic text-[#f8f8f8] leading-tight tracking-tight">
+             Design that speaks, <br/>
+             <span className="text-zinc-500">technology that performs.</span>
+           </h2>
+           <p className="text-sm sm:text-base font-light text-zinc-400 leading-[1.8] max-w-sm tracking-wide">
+             Crafting high-end immersive experiences for brands that value aesthetic precision and technical excellence.
+           </p>
          </div>
-         <div className="flex gap-4">
-            <a href={PROFILE.socials.email} className="px-8 py-3 bg-white text-black text-[10px] uppercase tracking-[0.3em] font-black rounded-full hover:bg-cyan-400 hover:scale-105 transition-all duration-500">Get in touch</a>
-            <a href="#works" className="px-8 py-3 bg-transparent border border-white/20 text-white text-[10px] uppercase tracking-[0.3em] font-black rounded-full hover:bg-white/5 transition-all duration-500">View projects</a>
+         <div className="flex flex-col sm:flex-row gap-6 pointer-events-auto">
+            <a href={PROFILE.socials.email} className="px-10 py-4 bg-white text-black text-[10px] uppercase tracking-[0.3em] font-bold rounded-full hover:bg-zinc-200 transition-all duration-500">
+              Start a Project
+            </a>
+            <a href="#works" className="px-10 py-4 bg-transparent border border-white/10 text-white text-[10px] uppercase tracking-[0.3em] font-bold rounded-full hover:bg-white/5 transition-all duration-500">
+              Explore Portfolio
+            </a>
          </div>
       </div>
 
-      <footer className="flex justify-between items-end pointer-events-auto">
-        <div className="flex gap-12">
+      <footer className="flex flex-col sm:flex-row justify-between items-center sm:items-end gap-6 sm:gap-0 pointer-events-none">
+        <div className="flex gap-10 sm:gap-12 pointer-events-auto">
           <a href={PROFILE.socials.github} target="_blank" rel="noreferrer" className="group flex items-center gap-4 text-zinc-700 hover:text-white transition-all duration-700">
-            <Github size={22}/>
-            <span className="text-[9px] uppercase tracking-[0.3em] font-black opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">Github</span>
+            <Github size={20}/>
+            <span className="text-[8px] uppercase tracking-[0.3em] font-black opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all hidden sm:inline">Github</span>
           </a>
           <a href={PROFILE.socials.linkedin} target="_blank" rel="noreferrer" className="group flex items-center gap-4 text-zinc-700 hover:text-white transition-all duration-700">
-            <Linkedin size={22}/>
-            <span className="text-[9px] uppercase tracking-[0.3em] font-black opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">LinkedIn</span>
+            <Linkedin size={20}/>
+            <span className="text-[8px] uppercase tracking-[0.3em] font-black opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all hidden sm:inline">LinkedIn</span>
           </a>
         </div>
-        <div className="flex flex-col items-end gap-3">
+        <div className="flex flex-col items-center sm:items-end gap-3 pointer-events-none">
            <div className="flex items-center gap-4">
              <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-ping" />
-             <p className="text-xs uppercase tracking-[0.4em] font-black text-white">Lagos, NG</p>
+             <p className="text-[10px] uppercase tracking-[0.4em] font-black text-white">Lagos, NG</p>
            </div>
            <div className="h-px w-20 bg-zinc-800" />
-           <p className="text-[9px] uppercase tracking-[0.3em] font-bold text-zinc-700">© 2025 All Rights Reserved</p>
+           <p className="text-[8px] uppercase tracking-[0.3em] font-bold text-zinc-700">© 2025 All Rights Reserved</p>
         </div>
       </footer>
 
@@ -383,23 +460,76 @@ function Overlay() {
   );
 }
 
+/* -------------------- UI Components -------------------- */
+
+function Loader() {
+  const { progress } = useProgress();
+  return (
+    <motion.div
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 1, ease: "easeInOut" }}
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#010101]"
+    >
+      <div className="relative flex flex-col items-center">
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-6xl font-serif italic text-white mb-8"
+        >
+          AS.
+        </motion.h1>
+        <div className="w-48 h-[1px] bg-zinc-800 relative overflow-hidden">
+          <motion.div
+            className="absolute inset-0 bg-white origin-left"
+            style={{ scaleX: progress / 100 }}
+          />
+        </div>
+        <motion.span
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="mt-4 text-[9px] uppercase tracking-[0.4em] text-zinc-500 font-bold"
+        >
+          Loading Architecture {Math.round(progress)}%
+        </motion.span>
+      </div>
+    </motion.div>
+  );
+}
+
 /* -------------------- Main Component -------------------- */
 
 export default function App() {
+  const [loading, setLoading] = useState(true);
+  const { progress } = useProgress();
+
+  useEffect(() => {
+    if (progress === 100) {
+      setTimeout(() => setLoading(false), 1500);
+    }
+  }, [progress]);
+
   return (
     <div className="w-full h-screen bg-[#010101] font-['Inter',sans-serif] selection:bg-cyan-500/40 overflow-hidden">
-      <Canvas
-        shadows
-        dpr={[1, 2]}
-        camera={{ position: [0, 0, 8], fov: 32 }}
-        gl={{ antialias: true, alpha: true, stencil: false, depth: true }}
-      >
-        <Suspense fallback={null}>
-          <ScrollControls pages={PROJECTS.length + 0.8} damping={0.15}>
-            <Scene />
-          </ScrollControls>
-        </Suspense>
-      </Canvas>
+      <AnimatePresence>
+        {loading && <Loader key="loader" />}
+      </AnimatePresence>
+
+      <div className="h-[50vh] sm:h-screen w-full fixed top-0 left-0">
+        <Canvas
+          shadows
+          dpr={[1, 2]}
+          camera={{ position: [0, 0, 8], fov: 32 }}
+          gl={{ antialias: true, alpha: true, stencil: false, depth: true }}
+        >
+          <Suspense fallback={null}>
+            <ScrollControls pages={PROJECTS.length + 0.8} damping={0.15}>
+              <Scene />
+            </ScrollControls>
+          </Suspense>
+        </Canvas>
+      </div>
       <Overlay />
 
       <style dangerouslySetInnerHTML={{ __html: `
